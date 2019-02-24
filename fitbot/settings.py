@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import dj_database_url
+
+
+DB_FROM_ENV = dj_database_url.config()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -80,6 +84,8 @@ DATABASES = {
     }
 }
 
+DATABASES['default'].update(DB_FROM_ENV)
+DATABASES['default']['CONN_MAX_AGE'] = 30
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -118,3 +124,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Facebook Access
+FB_ACCESS_TOKEN = os.environ.get('FB_ACCESS_TOKEN')
+FB_APP_ID = os.environ.get('FB_APP_ID')
+FB_CHALLENGE = os.environ.get('FB_CHALLENGE')
