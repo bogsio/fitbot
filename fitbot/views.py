@@ -1,5 +1,7 @@
 import json
 import requests
+
+from pprint import pprint
 from django.http import HttpResponse
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -42,6 +44,7 @@ def webhook(request):
     # Incoming message
     elif request.method == 'POST':
         event = json.loads(request.body)
+        pprint(event)
         if event['object'] == 'page':
             for entry in event['entry']:
                 try:

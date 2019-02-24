@@ -6,7 +6,7 @@ GET_STARTED = {
 PERSISTENT_MENU = [
     {
         "locale": "default",
-        "composer_input_disabled": True,
+        "composer_input_disabled": False,
         "call_to_actions": [
             {
                 "title": "Log Meal",
@@ -23,9 +23,14 @@ PERSISTENT_MENU = [
                         "payload": "LOG_LUNCH"
                     },
                     {
-                        "title": "DINNER",
+                        "title": "Dinner",
                         "type": "postback",
                         "payload": "LOG_DINNER"
+                    },
+                    {
+                        "title": "Snack",
+                        "type": "postback",
+                        "payload": "LOG_SNACK"
                     }
                 ]
             },
