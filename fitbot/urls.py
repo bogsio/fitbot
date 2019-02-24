@@ -19,5 +19,5 @@ from fitbot.views import webhook
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('webhook/', webhook),
+    path('webhook', webhook),
 ]
