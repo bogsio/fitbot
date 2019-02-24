@@ -16,8 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from fitbot.views import webhook
+from fitbot.utils import get_messenger_profile, set_persistent_menu, set_get_started
+from fitbot.menu import PERSISTENT_MENU, GET_STARTED
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('webhook', webhook),
 ]
+
+
+# print(get_messenger_profile())
+print(set_get_started(GET_STARTED))
+print(set_persistent_menu(PERSISTENT_MENU))
+print(get_messenger_profile())
