@@ -55,8 +55,8 @@ def webhook(request):
                 person.last_seen = now()
                 person.save()
 
-                bot = Chatbot(person)
-                bot.handle(msg_event)
+                bot = Chatbot()
+                bot.handle(person, msg_event)
 
                 #
                 # try:

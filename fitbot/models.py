@@ -6,28 +6,28 @@ from django.db import models
 class Person(models.Model):
     fb_id = models.CharField(max_length=200)
     last_seen = models.DateTimeField(blank=True, null=True)
-    state_name = models.CharField(max_length=100, null=True, blank=True)
-    state_params = JSONField(null=True, blank=True)
+    state = models.CharField(max_length=100, null=True, blank=True)
+    context = JSONField(null=True, blank=True)
 
     def save_meal(self):
-        if not self.state_params:
-            self.state_params = {}
+        if not self.context:
+            self.context = {}
             self.save()
         try:
-            meal_date = parse_date(self.state_params['date'])
+            meal_date = parse_date(self.context['date'])
         except:
             meal_date = None
 
         meal = Meal.objects.create(
             person=self,
             date=meal_date,
-            type=self.state_params.get('type', None),
-            comments=self.state_params.get('comments', None),
-            image=self.state_params.get('image', None)
+            type=self.context.get('type', None),
+            comments=self.context.get('comments', None),
+            image=self.context.get('image', None)
         )
 
-        self.state_name = None
-        self.state_params = {}
+        self.state = None
+        self.context = {}
         self.save()
 
         return meal

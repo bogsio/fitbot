@@ -55,7 +55,7 @@ class MessengerEvent(object):
 
         return False
 
-    def is_message(self):
+    def has_message(self):
         try:
             _ = self._event['messaging'][0]['message']
             return True
@@ -93,7 +93,7 @@ class MessengerEvent(object):
             return self._event['messaging'][0]['message']['quick_reply']['payload']
 
     def get_text(self):
-        if not self.is_message():
+        if not self.has_message():
             return None
 
         return self._event['messaging'][0]['message']['text']
