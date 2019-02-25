@@ -4,12 +4,15 @@ import requests
 from pprint import pprint
 from django.http import HttpResponse
 from django.conf import settings
+from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
+
+from fitbot.chatbot import Chatbot
+from fitbot.models import Person
+from fitbot.utils import MessengerEvent
 
 
 def message_handler(sender_id, message):
-    text = message['text']
-    print("Received text", text)
     answer = "Hi"
     uri = "https://graph.facebook.com/v2.6/me/messages?access_token=%s" % settings.FB_ACCESS_TOKEN
     data = {
@@ -28,29 +31,38 @@ def message_handler(sender_id, message):
 def webhook(request):
     # Webhook verification
     if request.method == 'GET':
-        print("In request.method == GET")
         mode = request.GET.get('hub.mode')
         token = request.GET.get('hub.verify_token')
         challenge = request.GET.get('hub.challenge')
 
-        print("mode", mode)
-        print("token", token)
-
         if mode and token:
             if mode == 'subscribe' and token == settings.FB_CHALLENGE:
-                print("Return challenge")
                 return HttpResponse(challenge, content_type="text/plain")
 
     # Incoming message
     elif request.method == 'POST':
         event = json.loads(request.body)
+        print("\n\n")
+        print("Incoming Event")
+        print('--------------------------')
         pprint(event)
+        print('--------------------------')
+
         if event['object'] == 'page':
             for entry in event['entry']:
-                try:
-                    message_event = entry['messaging'][0]
-                    message_handler(message_event['sender']['id'], message_event['message'])
-                except IndexError:
-                    pass
+                msg_event = MessengerEvent(entry)
+                person, _ = Person.objects.get_or_create(fb_id=str(msg_event.get_sender()))
+                person.last_seen = now()
+                person.save()
+
+                bot = Chatbot(person)
+                bot.handle(msg_event)
+
+                #
+                # try:
+                #     message_event = entry['messaging'][0]
+                #     message_handler(message_event['sender']['id'], message_event['message'])
+                # except (IndexError, KeyError):
+                #     pass
 
     return HttpResponse("ok", content_type="text/plain")

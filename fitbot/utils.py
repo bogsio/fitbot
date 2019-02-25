@@ -40,12 +40,20 @@ class MessengerEvent(object):
         """
         self._event = event
 
-    def is_postback(self):
+    def has_postback(self):
         try:
             _ = self._event['messaging'][0]['postback']
             return True
         except:
-            return False
+            pass
+
+        try:
+            _ = self._event['messaging'][0]['message']['quick_reply']
+            return True
+        except:
+            pass
+
+        return False
 
     def is_message(self):
         try:
@@ -54,7 +62,7 @@ class MessengerEvent(object):
         except:
             return False
 
-    def is_text(self):
+    def has_text(self):
         try:
             _ = self._event['messaging'][0]['message']['text']
             return True
@@ -76,10 +84,13 @@ class MessengerEvent(object):
             return False
 
     def get_postback(self):
-        if not self.is_postback():
+        if not self.has_postback():
             return None
 
-        return self._event['messaging'][0]['postback']['payload']
+        try:
+            return self._event['messaging'][0]['postback']['payload']
+        except:
+            return self._event['messaging'][0]['message']['quick_reply']['payload']
 
     def get_text(self):
         if not self.is_message():
@@ -96,6 +107,9 @@ class MessengerEvent(object):
         if not self.has_images():
             return []
         return [a for a in self.get_attachments() if a['type'] == 'image']
+
+    def get_sender(self):
+        return self._event['messaging'][0]['sender']['id']
 
 
 
