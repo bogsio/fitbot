@@ -1,3 +1,6 @@
+from fitbot.chatbot import PostBacks
+
+
 GET_STARTED = {
     "payload": "GET_STARTED"
 }
@@ -15,31 +18,31 @@ PERSISTENT_MENU = [
                     {
                         "title": "Breakfast",
                         "type": "postback",
-                        "payload": "LOG_BREAKFAST"
+                        "payload": PostBacks.LOG_BREAKFAST
                     },
                     {
                         "title": "Lunch",
                         "type": "postback",
-                        "payload": "LOG_LUNCH"
+                        "payload": PostBacks.LOG_LUNCH
                     },
                     {
                         "title": "Dinner",
                         "type": "postback",
-                        "payload": "LOG_DINNER"
+                        "payload": PostBacks.LOG_DINNER
                     },
                     {
                         "title": "Snack",
                         "type": "postback",
-                        "payload": "LOG_SNACK"
+                        "payload": PostBacks.LOG_SNACK
                     }
                 ]
             },
-        # {
-        #   "type": "web_url",
-        #   "title": "Latest News",
-        #   "url": "http://www.messenger.com/",
-        #   "webview_height_ratio": "full"
-        # }
+
+            {
+                "title": "Log Progress",
+                "type": "postback",
+                "payload": PostBacks.LOG_PROGRESS
+            },
         ]
     },
 ]

@@ -32,6 +32,30 @@ class Person(models.Model):
 
         return meal
 
+    def save_progress(self):
+        if not self.context:
+            self.context = {}
+            self.save()
+        try:
+            progress_date = parse_date(self.context['date'])
+        except:
+            progress_date = None
+
+        meal = Progress.objects.create(
+            person=self,
+            date=progress_date,
+            image=self.context.get('image', None),
+            weight=self.context.get('weight', None),
+            weight_units=self.context.get('weight_units', None),
+            bmi=self.context.get('bmi', None),
+        )
+
+        self.state = None
+        self.context = {}
+        self.save()
+
+        return meal
+
 
 class Meal(models.Model):
     person = models.ForeignKey(Person, on_delete=models.CASCADE)
@@ -39,4 +63,13 @@ class Meal(models.Model):
     type = models.CharField(max_length=100, blank=True, null=True)
     image = models.URLField(null=True, blank=True, max_length=1000)
     comments = models.TextField(null=True, blank=True)
+
+
+class Progress(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    date = models.DateField(null=True, blank=True)
+    image = models.URLField(null=True, blank=True, max_length=1000)
+    weight = models.FloatField(null=True, blank=True)
+    weight_units = models.CharField(max_length=20, null=True, blank=True)
+    bmi = models.FloatField(null=True, blank=True)
 

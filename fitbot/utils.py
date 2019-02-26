@@ -98,6 +98,12 @@ class MessengerEvent(object):
 
         return self._event['messaging'][0]['message']['text']
 
+    def get_nlp(self):
+        if not self.has_text():
+            return {}
+
+        return self._event['messaging'][0]['message'].get('nlp', {})
+
     def get_attachments(self):
         if not self.has_attachments():
             return []

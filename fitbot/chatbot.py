@@ -2,10 +2,10 @@ import json
 from pprint import pprint
 
 import requests
-from django.utils.timezone import now
 
 from django.conf import settings
 
+from fitbot.handlers import progress, meals
 from fitbot.models import Person
 from fitbot.utils import MessengerEvent
 
@@ -20,17 +20,24 @@ class Meals:
 class States:
     WAITING_FOR_MEAL_PHOTO = 'WAITING_FOR_MEAL_PHOTO'
     WAITING_FOR_MEAL_COMMENTS = 'WAITING_FOR_MEAL_COMMENTS'
-    COMPLETE_MEAL_LOG = 'COMPLETE_MEAL_LOG'
+
+    WAITING_FOR_PROGRESS_PHOTO = 'WAITING_FOR_PROGRESS_PHOTO'
+    WAITING_FOR_PROGRESS_WEIGHT = 'WAITING_FOR_PROGRESS_WEIGHT'
+    WAITING_FOR_PROGRESS_BMI = 'WAITING_FOR_PROGRESS_BMI'
 
 
 class PostBacks:
     SKIP_COMMENTS = "SKIP_COMMENTS"
     SKIP_PHOTO = "SKIP_PHOTO"
+    SKIP_WEIGHT = "SKIP_WEIGHT"
+    SKIP_BMI = "SKIP_BMI"
 
     LOG_BREAKFAST = "LOG_BREAKFAST"
     LOG_LUNCH = "LOG_LUNCH"
     LOG_DINNER = "LOG_DINNER"
     LOG_SNACK = "LOG_SNACK"
+
+    LOG_PROGRESS = "LOG_PROGRESS"
 
 
 PB_TO_MEAL_TYPES = {
@@ -80,6 +87,68 @@ class Chatbot(object):
         pprint(data)
         print("======================")
         response = requests.post(uri, data=json.dumps(data), headers={'content-type': 'application/json'})
+
+    @classmethod
+    def send_carousel(cls, person, elements, height_ratio="tall"):
+        data = {
+            # 'messaging_type': 'RESPONSE',
+            "recipient": {"id": person.fb_id},
+            "message": {
+                "attachment": {
+                    "type": "template",
+                    "payload": {
+                        "template_type": "generic",
+                        "elements": []
+                    }
+
+                }
+            }
+        }
+
+        for element in elements:
+            print("- Element", element)
+            title, image_url, subtitle, action, buttons = element
+            element_payload = {
+                "title": title,
+                "image_url": image_url,
+                "subtitle": subtitle,
+                "default_action": {
+                    "webview_height_ratio": height_ratio
+                },
+                "buttons": []
+            }
+            if action[:4] == 'http':
+                element_payload["default_action"]["type"] = "web_url"
+                element_payload["default_action"]["url"] = action
+            else:
+                element_payload["default_action"]["type"] = "postback"
+                element_payload["default_action"]["url"] = action
+
+            for button in buttons:
+                title, action = button
+                button_payload = {
+                    "title": title
+                }
+                if action[:4] == 'http':
+                    button_payload["type"] = "web_url"
+                    button_payload["url"] = action
+                else:
+                    button_payload["type"] = "postback"
+                    button_payload["payload"] = action
+
+                element_payload["buttons"].append(button_payload)
+
+            data["message"]["attachment"]["payload"]["elements"].append(element_payload)
+
+        print("\n\n")
+        print("Outgoing data")
+        print("======================")
+        pprint(data)
+        print("======================")
+        uri = "https://graph.facebook.com/v2.6/me/messages?access_token=%s" % settings.FB_ACCESS_TOKEN
+        response = requests.post(uri, data=json.dumps(data), headers={'content-type': 'application/json'})
+
+
 
     @classmethod
     def register_handler(cls, **conditions):
@@ -154,69 +223,29 @@ class Chatbot(object):
         return best_handler(self, person, event)
 
 
-def complete_meal(bot, person, event):
-    meal = person.save_meal()
-    bot.send_text(person, "Done! Keep up the good work!")
+Chatbot.register_handler(postback__in=PB_TO_MEAL_TYPES.keys())(
+    meals.handle_log_meal)
+Chatbot.register_handler(postback__eq=PostBacks.SKIP_PHOTO, state__eq=States.WAITING_FOR_MEAL_PHOTO)(
+    meals.handle_skip_meal_photo)
+Chatbot.register_handler(postback__eq=PostBacks.SKIP_COMMENTS, state__eq=States.WAITING_FOR_MEAL_COMMENTS)(
+    meals.handle_skip_comments)
+Chatbot.register_handler(state__eq=States.WAITING_FOR_MEAL_PHOTO)(
+    meals.handle_meal_photo)
+Chatbot.register_handler(state__eq=States.WAITING_FOR_MEAL_COMMENTS)(
+    meals.handle_meal_comments)
 
 
-@Chatbot.register_handler(postback__in=PB_TO_MEAL_TYPES.keys())
-def handle_log_meal(bot, person, event):
-    pb = event.get_postback()
-    ctx = {'type': PB_TO_MEAL_TYPES[pb], 'date': str(now().date())}
-    state = States.WAITING_FOR_MEAL_PHOTO
-    person.state = state
-    person.context = ctx
-    person.save()
-    bot.send_text(person, "Great, let's do that, just snap a picture of your food",
-                  quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
-
-
-@Chatbot.register_handler(postback__eq=PostBacks.SKIP_PHOTO, state__eq=States.WAITING_FOR_MEAL_PHOTO)
-def handle_skip_photo(bot, person, event):
-    if person.state == States.WAITING_FOR_MEAL_PHOTO:
-        bot.send_text(person, "Ok, tell me a bit about your meal",
-                      quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
-
-        person.state = States.WAITING_FOR_MEAL_COMMENTS
-        person.save()
-
-
-@Chatbot.register_handler(postback__eq=PostBacks.SKIP_COMMENTS, state__eq=States.WAITING_FOR_MEAL_COMMENTS)
-def handle_skip_comments(bot, person, event):
-    if person.state == States.WAITING_FOR_MEAL_COMMENTS:
-        person.state = States.COMPLETE_MEAL_LOG
-        person.save()
-        complete_meal(bot, person, event)
-
-
-@Chatbot.register_handler(state__eq=States.WAITING_FOR_MEAL_PHOTO)
-def handle_meal_photo(bot, person, event):
-    assert person.state == States.WAITING_FOR_MEAL_PHOTO
-    if not event.has_images():
-        bot.send_text(person, "Sorry, I didn't get that ... Please upload a picture or press \"Skip Photo\"",
-                      quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
-        return
-
-    images = event.get_images()
-    image_url = images[0]['payload']['url']
-    person.state = States.WAITING_FOR_MEAL_COMMENTS
-    person.context['image'] = image_url
-    person.save()
-
-    bot.send_text(person, "Ok, tell me a bit about your meal",
-                  quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
-
-
-@Chatbot.register_handler(state__eq=States.WAITING_FOR_MEAL_COMMENTS)
-def handle_meal_comments(bot, person, event):
-    assert person.state == States.WAITING_FOR_MEAL_COMMENTS
-
-    if not event.has_text():
-        bot.send_text(person, "Sorry, I didn't get that ... ",
-                      quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
-        return
-
-    text = event.get_text()
-    person.context['comments'] = text
-    person.save()
-    complete_meal(bot, person, event)
+Chatbot.register_handler(postback__eq=PostBacks.LOG_PROGRESS)(
+    progress.handle_log_progress)
+Chatbot.register_handler(state__eq=States.WAITING_FOR_PROGRESS_PHOTO)(
+    progress.handle_progress_photo)
+Chatbot.register_handler(postback__eq=PostBacks.SKIP_PHOTO, state__eq=States.WAITING_FOR_PROGRESS_PHOTO)(
+    progress.handle_skip_progress_photo)
+Chatbot.register_handler(state__eq=States.WAITING_FOR_PROGRESS_WEIGHT)(
+    progress.handle_progress_weight)
+Chatbot.register_handler(postback__eq=PostBacks.SKIP_WEIGHT, state__eq=States.WAITING_FOR_PROGRESS_WEIGHT)(
+    progress.handle_skip_progress_weight)
+Chatbot.register_handler(state__eq=States.WAITING_FOR_PROGRESS_BMI)(
+    progress.handle_progress_bmi)
+Chatbot.register_handler(postback__eq=PostBacks.SKIP_BMI, state__eq=States.WAITING_FOR_PROGRESS_BMI)(
+    progress.handle_skip_progress_bmi)

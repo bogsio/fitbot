@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Person, Meal
+from .models import Person, Meal, Progress
+
 
 @admin.register(Person)
 class PersonAdmin(admin.ModelAdmin):
@@ -9,4 +10,11 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(Meal)
 class MealAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('type', 'date')
+    list_filter = ('type', 'date')
+
+
+@admin.register(Progress)
+class ProgressAdmin(admin.ModelAdmin):
+    list_display = ('weight', 'date')
+    list_filter = ('date', )
