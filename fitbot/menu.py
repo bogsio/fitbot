@@ -12,6 +12,22 @@ PERSISTENT_MENU = [
         "composer_input_disabled": False,
         "call_to_actions": [
             {
+                "title": "Diary",
+                "type": "nested",
+                "call_to_actions": [
+                    {
+                        "title": "Food",
+                        "type": "postback",
+                        "payload": PostBacks.CHECK_FOOD
+                    },
+                    {
+                        "title": "Progress",
+                        "type": "postback",
+                        "payload": PostBacks.CHECK_PROGRESS
+                    },
+                ]
+            },
+            {
                 "title": "Log Meal",
                 "type": "nested",
                 "call_to_actions": [

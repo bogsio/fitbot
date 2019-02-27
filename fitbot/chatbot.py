@@ -25,6 +25,9 @@ class States:
     WAITING_FOR_PROGRESS_WEIGHT = 'WAITING_FOR_PROGRESS_WEIGHT'
     WAITING_FOR_PROGRESS_BMI = 'WAITING_FOR_PROGRESS_BMI'
 
+    CHECKING_FOOD = "CHECKING_FOOD"
+    CHECKING_PROGRESS = "CHECKING_PROGRESS"
+
 
 class PostBacks:
     SKIP_COMMENTS = "SKIP_COMMENTS"
@@ -38,6 +41,12 @@ class PostBacks:
     LOG_SNACK = "LOG_SNACK"
 
     LOG_PROGRESS = "LOG_PROGRESS"
+
+    CHECK_FOOD = "CHECK_FOOD"
+    CHECK_PROGRESS = "CHECK_PROGRESS"
+
+    PREV_DAY = "PREV_DAY"
+    NEXT_DAY = "NEXT_DAY"
 
 
 PB_TO_MEAL_TYPES = {
@@ -233,6 +242,12 @@ Chatbot.register_handler(state__eq=States.WAITING_FOR_MEAL_PHOTO)(
     meals.handle_meal_photo)
 Chatbot.register_handler(state__eq=States.WAITING_FOR_MEAL_COMMENTS)(
     meals.handle_meal_comments)
+Chatbot.register_handler(postback__eq=PostBacks.CHECK_FOOD)(
+    meals.handle_check_food)
+Chatbot.register_handler(postback__eq=PostBacks.PREV_DAY, state__eq=States.CHECKING_FOOD)(
+    meals.handle_prev_day)
+Chatbot.register_handler(postback__eq=PostBacks.NEXT_DAY, state__eq=States.CHECKING_FOOD)(
+    meals.handle_next_day)
 
 
 Chatbot.register_handler(postback__eq=PostBacks.LOG_PROGRESS)(

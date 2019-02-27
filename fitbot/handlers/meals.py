@@ -1,6 +1,20 @@
+from datetime import timedelta
+
+from django.utils.dateparse import parse_date
 from django.utils.timezone import now
+from django.db.models import Max
 
 from fitbot.models import Meal
+
+
+def display_meals(bot, person, meals):
+    gallery = []
+    for meal in meals:
+        gallery.append(
+            (meal.type, meal.image, meal.comments, meal.image, [('View', meal.image), ])
+        )
+
+    bot.send_carousel(person, gallery)
 
 
 def complete_meal(bot, person, event):
@@ -13,14 +27,8 @@ def complete_meal(bot, person, event):
         return
 
     bot.send_text(person, "Here's how you're doing today so far")
+    display_meals(bot, person, today_meals)
 
-    gallery = []
-    for meal in today_meals:
-        gallery.append(
-            (meal.type, meal.image, meal.comments, meal.image, [('View', meal.image), ])
-        )
-
-    bot.send_carousel(person, gallery)
 
 
 def handle_log_meal(bot, person, event):
@@ -77,3 +85,63 @@ def handle_meal_comments(bot, person, event):
     person.context['comments'] = text
     person.save()
     complete_meal(bot, person, event)
+
+
+def display_meal_diary(bot, person, event):
+    from fitbot.chatbot import PostBacks
+    # Put in the latest day, if there is one
+    if person.context.get('day') is None:
+        latest_date = Meal.objects.all().aggregate(Max('date'))['date__max']
+        if latest_date is None:
+            bot.send_text(person, "You haven't logged anything yet, why don't you start now?",
+                          quick_replies=[('Log Meal Now', PostBacks.LOG_SNACK)])
+            return
+        print(latest_date)
+        person.context['day'] = str(latest_date)
+        person.save()
+
+    d = parse_date(person.context['day'])
+    print("d", d)
+
+    # Get all the meals for that day
+    meals = Meal.objects.filter(date=d)
+
+    # No meals logged on that day
+    if not meals:
+        bot.send_text(person, f"You haven't logged anything on {d}",
+                      quick_replies=[('Prev Day', PostBacks.PREV_DAY), ('Next Day', PostBacks.NEXT_DAY)])
+        return
+
+    # Finally, display the meals for that day
+    bot.send_text(person, f"Here's what you had on {d}")
+    display_meals(bot, person, meals)
+    bot.send_text(person, "Checkout other days",
+                  quick_replies=[('Prev Day', PostBacks.PREV_DAY), ('Next Day', PostBacks.NEXT_DAY)])
+
+
+def handle_check_food(bot, person, event):
+    from fitbot.chatbot import States
+    person.state = States.CHECKING_FOOD
+    person.context.pop('day', None)
+    person.save()
+    display_meal_diary(bot, person, event)
+
+
+def handle_prev_day(bot, person, event):
+    day = person.context.pop('day', None)
+    if day is not None:
+        day = parse_date(day) + timedelta(days=-1)
+        person.context['day'] = str(day)
+        person.save()
+
+    display_meal_diary(bot, person, event)
+
+
+def handle_next_day(bot, person, event):
+    day = person.context.pop('day', None)
+    if day is not None:
+        day = parse_date(day) + timedelta(days=1)
+        person.context['day'] = str(day)
+        person.save()
+
+    display_meal_diary(bot, person, event)
