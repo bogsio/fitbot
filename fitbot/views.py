@@ -55,6 +55,14 @@ def webhook(request):
                 person.last_seen = now()
                 person.save()
 
+                if msg_event.has_text():
+                    print("=" * 20)
+                    try:
+                        msg_event.fetch_nlu_data(msg_event.get_text())
+                    except:
+                        pass
+                    print("=" * 20)
+
                 bot = Chatbot()
                 bot.handle(person, msg_event)
 

@@ -1,6 +1,19 @@
+import io
 import json
 import requests
+from snips_nlu import SnipsNLUEngine
+from snips_nlu.default_configs import CONFIG_EN
 from django.conf import settings
+
+nlu = None
+
+with io.open("fitbot/datasets/training_dataset_1551645479.json") as f:
+    data = f.read().replace('\ufeff', '')
+    print(data[:10])
+    dataset = json.loads(data)
+    nlu = SnipsNLUEngine(config=CONFIG_EN)
+    nlu.fit(dataset)
+    nlu.parse("I ate some bread with butter for breakfast")
 
 
 def get_messenger_profile():
@@ -39,6 +52,21 @@ class MessengerEvent(object):
         :param event: The Facebook Messenger json
         """
         self._event = event
+        self._nlu_result = None
+
+    @staticmethod
+    def fetch_nlu_data(text):
+        # text_input = dialogflow.types.TextInput(text=text, language_code='en')
+        # query_input = dialogflow.types.QueryInput(text=text_input)
+        # response = session_client.detect_intent(
+        #     session=session, query_input=query_input)
+        #
+        # print(response)
+        # print(response.intent)
+        # print(response.entities)
+        if nlu is not None:
+            p = nlu.parse(text)
+            print(p)
 
     def has_postback(self):
         try:
@@ -83,6 +111,18 @@ class MessengerEvent(object):
         except:
             return False
 
+    def has_intent(self):
+        if not self.has_text():
+            return False
+
+        text = self.get_text()
+        if not text:
+            return False
+
+        if self._nlu_result is not None:
+            self._nlu_result = nlu.parse(text)
+            return self._nlu_result['intent']['intentName'] is not None
+
     def get_postback(self):
         if not self.has_postback():
             return None
@@ -103,6 +143,12 @@ class MessengerEvent(object):
             return {}
 
         return self._event['messaging'][0]['message'].get('nlp', {})
+
+    def get_intent(self):
+        if not self.has_intent():
+            return None
+
+        return self._nlu_result['intent']['intentName']
 
     def get_attachments(self):
         if not self.has_attachments():
