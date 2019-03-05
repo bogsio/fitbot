@@ -31,7 +31,7 @@ def complete_meal(bot, person, event):
 
 
 
-def handle_log_meal(bot, person, event):
+def handle_log_meal_via_postback(bot, person, event):
     from fitbot.chatbot import States, PostBacks, PB_TO_MEAL_TYPES
     pb = event.get_postback()
     ctx = {'type': PB_TO_MEAL_TYPES[pb], 'date': str(now().date())}
@@ -43,8 +43,43 @@ def handle_log_meal(bot, person, event):
                   quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
 
 
+def handle_log_meal_via_intent(bot, person, event):
+    from fitbot.chatbot import Meals, States, PostBacks
+    ctx = event.get_entities()
+
+    if person.context is None:
+        person.context = {}
+
+    if 'meal_type' in ctx:
+        person.context['type'] = {
+            'breakfast': Meals.BREAKFAST,
+            'lunch': Meals.LUNCH,
+            'dinner': Meals.DINNER,
+            'snack': Meals.SNACK
+        }.get(ctx['meal_type'].lower(), Meals.SNACK)
+    else:
+        person.context['type'] = Meals.SNACK
+
+    if 'meal_content' in ctx:
+        person.context['comments'] = ctx['meal_content']
+
+    if 'meal_date' in ctx:
+        pass
+    else:
+        person.context['date'] = str(now().date())
+
+    state = States.WAITING_FOR_MEAL_PHOTO
+    person.state = state
+
+    person.save()
+    bot.send_text(person, "Snap a picture of your food",
+                  quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
+
+
 def handle_skip_meal_photo(bot, person, event):
     from fitbot.chatbot import States, PostBacks
+    person.context['image'] = 'https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Ff%2Ff4%2FNorwegian.open.sandwich-01.jpg%2F1200px-Norwegian.open.sandwich-01.jpg&f=1'
+    person.save()
     bot.send_text(person, "Ok, tell me a bit about your meal",
                   quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
 

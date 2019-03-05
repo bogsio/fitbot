@@ -10,13 +10,6 @@ from fitbot.models import Person
 from fitbot.utils import MessengerEvent
 
 
-class Meals:
-    BREAKFAST = 'breakfast'
-    LUNCH = 'lunch'
-    DINNER = 'dinner'
-    SNACK = 'snack'
-
-
 class States:
     WAITING_FOR_MEAL_PHOTO = 'WAITING_FOR_MEAL_PHOTO'
     WAITING_FOR_MEAL_COMMENTS = 'WAITING_FOR_MEAL_COMMENTS'
@@ -47,6 +40,17 @@ class PostBacks:
 
     PREV_DAY = "PREV_DAY"
     NEXT_DAY = "NEXT_DAY"
+
+
+class Intents:
+    LOG_MEAL = "LOG_MEAL"
+
+
+class Meals:
+    BREAKFAST = 'breakfast'
+    LUNCH = 'lunch'
+    DINNER = 'dinner'
+    SNACK = 'snack'
 
 
 PB_TO_MEAL_TYPES = {
@@ -131,7 +135,7 @@ class Chatbot(object):
                 element_payload["default_action"]["url"] = action
             else:
                 element_payload["default_action"]["type"] = "postback"
-                element_payload["default_action"]["url"] = action
+                element_payload["default_action"]["payload"] = action
 
             for button in buttons:
                 title, action = button
@@ -206,6 +210,12 @@ class Chatbot(object):
             if chunks[1] == 'in':
                 return person.state in condition_value
 
+        if chunks[0] == 'intent':
+            if chunks[1] == 'eq':
+                if not event.has_intent():
+                    return False
+                return event.get_intent() == condition_value
+
     def handle(self, person, event):
         assert isinstance(event, MessengerEvent)
         assert isinstance(person, Person)
@@ -227,13 +237,16 @@ class Chatbot(object):
                 best_score = len(conditions)
 
         if best_handler is None:
+            print("No appropriate handler found ...")
             return
 
         return best_handler(self, person, event)
 
 
 Chatbot.register_handler(postback__in=PB_TO_MEAL_TYPES.keys())(
-    meals.handle_log_meal)
+    meals.handle_log_meal_via_postback)
+Chatbot.register_handler(intent__eq=Intents.LOG_MEAL)(
+    meals.handle_log_meal_via_intent)
 Chatbot.register_handler(postback__eq=PostBacks.SKIP_PHOTO, state__eq=States.WAITING_FOR_MEAL_PHOTO)(
     meals.handle_skip_meal_photo)
 Chatbot.register_handler(postback__eq=PostBacks.SKIP_COMMENTS, state__eq=States.WAITING_FOR_MEAL_COMMENTS)(

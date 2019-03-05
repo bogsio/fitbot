@@ -1,4 +1,4 @@
-%[log_meal]('training': '400', 'testing': '100')
+%[LOG_MEAL]('training': '400', 'testing': '100')
     ~[I?] ~[had] @[meal_content] for @[meal_type]
     for @[meal_type] ~[I?] ~[had] @[meal_content]
     ~[had?] for? @[meal_type]: @[meal_content]

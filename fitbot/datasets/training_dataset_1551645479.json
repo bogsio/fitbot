@@ -295,7 +295,7 @@
     }
   },
   "intents": {
-    "log_meal": {
+    "LOG_MEAL": {
       "utterances": [
         {
           "data": [

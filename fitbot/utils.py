@@ -68,6 +68,20 @@ class MessengerEvent(object):
             p = nlu.parse(text)
             print(p)
 
+    @property
+    def nlu_result(self):
+        if self._nlu_result is None:
+            if not self.has_text():
+                return
+
+            text = self.get_text()
+            if not text:
+                return
+
+            self._nlu_result = nlu.parse(text)
+        return self._nlu_result
+
+
     def has_postback(self):
         try:
             _ = self._event['messaging'][0]['postback']
@@ -112,16 +126,9 @@ class MessengerEvent(object):
             return False
 
     def has_intent(self):
-        if not self.has_text():
-            return False
-
-        text = self.get_text()
-        if not text:
-            return False
-
-        if self._nlu_result is not None:
-            self._nlu_result = nlu.parse(text)
-            return self._nlu_result['intent']['intentName'] is not None
+        if self.nlu_result is not None:
+            return self.nlu_result['intent']['intentName'] is not None
+        return False
 
     def get_postback(self):
         if not self.has_postback():
@@ -148,7 +155,13 @@ class MessengerEvent(object):
         if not self.has_intent():
             return None
 
-        return self._nlu_result['intent']['intentName']
+        return self.nlu_result['intent']['intentName']
+
+    def get_entities(self):
+        if self.nlu_result is None:
+            return {}
+
+        return {slot['entity']: slot['value']['value'] for slot in self.nlu_result['slots']}
 
     def get_attachments(self):
         if not self.has_attachments():
