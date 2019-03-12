@@ -64,7 +64,7 @@ def handle_log_meal_via_intent(bot, person, event):
         person.context['comments'] = ctx['meal_content']
 
     if 'meal_date' in ctx:
-        pass
+        person.context['date'] = str(ctx['meal_date'].date())
     else:
         person.context['date'] = str(now().date())
 

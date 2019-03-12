@@ -1,5 +1,8 @@
+from datetime import datetime
 import io
 import json
+from collections import defaultdict
+
 import requests
 from snips_nlu import SnipsNLUEngine
 from snips_nlu.default_configs import CONFIG_EN
@@ -7,9 +10,13 @@ from django.conf import settings
 
 nlu = None
 
-with io.open("fitbot/datasets/training_dataset_1551645479.json") as f:
+
+SLOT_TRANSFORMERS = {
+    'snips/datetime': lambda value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S %z')
+}
+
+with io.open("fitbot/datasets/training_dataset_1551798832.json") as f:
     data = f.read().replace('\ufeff', '')
-    print(data[:10])
     dataset = json.loads(data)
     nlu = SnipsNLUEngine(config=CONFIG_EN)
     nlu.fit(dataset)
@@ -161,7 +168,18 @@ class MessengerEvent(object):
         if self.nlu_result is None:
             return {}
 
-        return {slot['entity']: slot['value']['value'] for slot in self.nlu_result['slots']}
+        entities_ = {}
+        for slot in self.nlu_result['slots']:
+            type_ = slot['entity']
+            value_ = slot['value']['value']
+            slot_ = slot['slotName']
+
+            if type_ in SLOT_TRANSFORMERS:
+                value_ = SLOT_TRANSFORMERS[type_](value_)
+
+            entities_[slot_] = value_
+
+        return entities_
 
     def get_attachments(self):
         if not self.has_attachments():

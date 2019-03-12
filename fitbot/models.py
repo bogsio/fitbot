@@ -16,6 +16,7 @@ class Person(models.Model):
         try:
             meal_date = parse_date(self.context['date'])
         except:
+            print("!! Could not parse date meal", self.context['date'])
             meal_date = None
 
         meal = Meal.objects.create(
