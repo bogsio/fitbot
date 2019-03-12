@@ -1,15 +1,21 @@
-%[VIEW_MEAL_DIARY]('training': '100')
+%[VIEW_MEAL_DIARY]('training': '200')
     view diary
     let's view my diary
     view food
     check food
     check diary
+    check my diary
+    let's look at my diary
     I want to view my diary
     view diary @[meal_date]
-    what did I eat on? @[meal_date]
-    what did I have on? @[meal_date]
-    food diary for? @[meal_date]
-    view food for? @[meal_date]
+    what did I eat on @[meal_date]
+    what did I eat @[meal_date]
+    what did I have on @[meal_date]
+    what did I have @[meal_date]
+    food diary for @[meal_date]
+    food diary @[meal_date]
+    view food for @[meal_date]
+    view food @[meal_date]
 
 @[meal_date]('entity': 'snips/datetime')
     ~[today]
