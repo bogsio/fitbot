@@ -15,7 +15,7 @@ SLOT_TRANSFORMERS = {
     'snips/datetime': lambda value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S %z')
 }
 
-with io.open("fitbot/datasets/training_dataset_1551798832.json") as f:
+with io.open("fitbot/datasets/training_dataset_1552405918.json") as f:
     data = f.read().replace('\ufeff', '')
     dataset = json.loads(data)
     nlu = SnipsNLUEngine(config=CONFIG_EN)

@@ -1,0 +1,47 @@
+%[VIEW_MEAL_DIARY]('training': '100')
+    view diary
+    let's view my diary
+    view food
+    check food
+    check diary
+    I want to view my diary
+    view diary @[meal_date]
+    what did I eat on? @[meal_date]
+    what did I have on? @[meal_date]
+    food diary for? @[meal_date]
+    view food for? @[meal_date]
+
+@[meal_date]('entity': 'snips/datetime')
+    ~[today]
+    ~[tomorrow]
+    ~[two days ago]
+    ~[last night]
+    ~[the day before today]
+    ~[yesterday night]
+    ~[yesterday]
+    ~[on the 23rd of april]
+    ~[22 aug 2018]
+    ~[27th of February]
+    ~[2nd June]
+    ~[1st July 2018]
+    ~[23 December]
+    ~[26 Decembre]
+    ~[23 Novembre]
+    ~[6th January]
+    ~[7th March]
+    ~[17th May]
+    ~[18th August]
+    ~[19th Septembre]
+    ~[19th September]
+    ~[20th October]
+    ~[20th Octobre]
+    ~[last Sunday]
+    ~[this Friday]
+    ~[this Monday]
+    ~[this Tuesday]
+    ~[this Wednesday]
+    ~[this Thursday]
+    ~[this Friday]
+    ~[this Saturday]
+    ~[this Sunday]
+    ~[last Monday]
