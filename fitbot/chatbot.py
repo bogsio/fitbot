@@ -44,6 +44,7 @@ class PostBacks:
 
 class Intents:
     LOG_MEAL = "LOG_MEAL"
+    VIEW_MEAL_DIARY = "VIEW_MEAL_DIARY"
 
 
 class Meals:
@@ -261,6 +262,8 @@ Chatbot.register_handler(postback__eq=PostBacks.PREV_DAY, state__eq=States.CHECK
     meals.handle_prev_day)
 Chatbot.register_handler(postback__eq=PostBacks.NEXT_DAY, state__eq=States.CHECKING_FOOD)(
     meals.handle_next_day)
+Chatbot.register_handler(intent__eq=Intents.VIEW_MEAL_DIARY)(
+    meals.handle_check_food_via_intent)
 
 
 Chatbot.register_handler(postback__eq=PostBacks.LOG_PROGRESS)(

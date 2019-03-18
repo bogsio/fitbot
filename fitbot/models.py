@@ -1,5 +1,5 @@
 from django.utils.dateparse import parse_date
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
 
 
@@ -19,12 +19,20 @@ class Person(models.Model):
             print("!! Could not parse date meal", self.context['date'])
             meal_date = None
 
+        if 'image' not in self.context:
+            image = MealImage.find_best(self.context.get('comments', ''))
+            if image is not None:
+                image_url = image.image
+            else:
+                image_url = "https://dl.dropboxusercontent.com/s/r2tgdyfag9egtql/Depositphotos_11389585_m-2015.jpg?dl=0"
+
         meal = Meal.objects.create(
             person=self,
             date=meal_date,
             type=self.context.get('type', None),
             comments=self.context.get('comments', None),
-            image=self.context.get('image', None)
+            # image=self.context.get('image', None)
+            image=image_url
         )
 
         self.state = None
@@ -74,3 +82,25 @@ class Progress(models.Model):
     weight_units = models.CharField(max_length=20, null=True, blank=True)
     bmi = models.FloatField(null=True, blank=True)
 
+
+class MealImage(models.Model):
+    image = models.URLField(null=True, blank=True, max_length=1000)
+    name = models.CharField(max_length=200)
+    tags = ArrayField(models.CharField(max_length=200), blank=True)
+
+    @staticmethod
+    def find_best(description):
+        if isinstance(description, str):
+            description = set(description.replace('.', '').replace(',', '').split())
+
+        best_image = None
+        best_score = 0
+
+        for meal_image in MealImage.objects.all():
+            image_tags = set(meal_image.tags)
+            intersected_tags = image_tags.intersection(description)
+            if len(intersected_tags) > best_score:
+                best_score = len(intersected_tags)
+                best_image = meal_image
+
+        return best_image

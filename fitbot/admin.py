@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Person, Meal, Progress
+from django.utils.safestring import mark_safe
+
+from .models import Person, Meal, Progress, MealImage
 
 
 @admin.register(Person)
@@ -18,3 +20,13 @@ class MealAdmin(admin.ModelAdmin):
 class ProgressAdmin(admin.ModelAdmin):
     list_display = ('weight', 'date')
     list_filter = ('date', )
+
+
+@admin.register(MealImage)
+class MealImageAdmin(admin.ModelAdmin):
+    list_display = ('admin_image', 'name', 'tags')
+
+    def admin_image(self, obj):
+        return mark_safe('<img width="50px" src="%s"/>' % obj.image)
+
+    admin_image.allow_tags = True

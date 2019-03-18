@@ -30,7 +30,6 @@ def complete_meal(bot, person, event):
     display_meals(bot, person, today_meals)
 
 
-
 def handle_log_meal_via_postback(bot, person, event):
     from fitbot.chatbot import States, PostBacks, PB_TO_MEAL_TYPES
     pb = event.get_postback()
@@ -78,8 +77,8 @@ def handle_log_meal_via_intent(bot, person, event):
 
 def handle_skip_meal_photo(bot, person, event):
     from fitbot.chatbot import States, PostBacks
-    person.context['image'] = 'https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Ff%2Ff4%2FNorwegian.open.sandwich-01.jpg%2F1200px-Norwegian.open.sandwich-01.jpg&f=1'
-    person.save()
+    # person.context['image'] = 'https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Ff%2Ff4%2FNorwegian.open.sandwich-01.jpg%2F1200px-Norwegian.open.sandwich-01.jpg&f=1'
+    # person.save()
     bot.send_text(person, "Ok, tell me a bit about your meal",
                   quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
 
@@ -136,7 +135,6 @@ def display_meal_diary(bot, person, event):
         person.save()
 
     d = parse_date(person.context['day'])
-    print("d", d)
 
     # Get all the meals for that day
     meals = Meal.objects.filter(date=d)
@@ -157,7 +155,21 @@ def display_meal_diary(bot, person, event):
 def handle_check_food(bot, person, event):
     from fitbot.chatbot import States
     person.state = States.CHECKING_FOOD
+
+    # Make sure there's no day set here. We want to display the current day
     person.context.pop('day', None)
+    person.save()
+    display_meal_diary(bot, person, event)
+
+
+def handle_check_food_via_intent(bot, person, event):
+    from fitbot.chatbot import States
+    person.state = States.CHECKING_FOOD
+    ctx = event.get_entities()
+
+    if 'meal_date' in ctx:
+        person.context['day'] = str(ctx['meal_date'].date())
+
     person.save()
     display_meal_diary(bot, person, event)
 

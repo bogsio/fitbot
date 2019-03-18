@@ -1,0 +1,12 @@
+{
+  "parsers_metadata": [
+    {
+      "entity_identifier": "meal_content",
+      "entity_parser": "parser_1"
+    },
+    {
+      "entity_identifier": "meal_type",
+      "entity_parser": "parser_2"
+    }
+  ]
+}

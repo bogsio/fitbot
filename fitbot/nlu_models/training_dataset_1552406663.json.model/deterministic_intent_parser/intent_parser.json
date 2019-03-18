@@ -1,0 +1,66 @@
+{
+  "config": {
+    "ignore_stop_words": true,
+    "max_pattern_length": 1000,
+    "max_queries": 500,
+    "unit_name": "deterministic_intent_parser"
+  },
+  "group_names_to_slot_names": {
+    "group0": "meal_content",
+    "group1": "meal_date",
+    "group2": "meal_type"
+  },
+  "language_code": "en",
+  "patterns": {
+    "LOG_MEAL": [
+      "^\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*i\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*had\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*$",
+      "^\\s*(?P<group1>%SNIPSDATETIME%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*i\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*i\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*(?P<group1>%SNIPSDATETIME%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*(?P<group1>%SNIPSDATETIME%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*i\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*i\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*i\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*i\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*(?P<group1>%SNIPSDATETIME%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group1>%SNIPSDATETIME%)\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*$",
+      "^\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*i\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*i\\s*ate\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*$",
+      "^\\s*ate\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*(?P<group0>%MEAL_CONTENT%)\\s*$",
+      "^\\s*i\\s*had\\s*(?P<group0>%MEAL_CONTENT%)\\s*for\\s*(?P<group2>%MEAL_TYPE%)\\s*$"
+    ],
+    "VIEW_MEAL_DIARY": [
+      "^\\s*view\\s*diary\\s*$",
+      "^\\s*let\\s*s\\s*view\\s*diary\\s*$",
+      "^\\s*i\\s*want\\s*view\\s*diary\\s*$",
+      "^\\s*food\\s*diary\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*let\\s*s\\s*look\\s*at\\s*diary\\s*$",
+      "^\\s*check\\s*diary\\s*$",
+      "^\\s*view\\s*food\\s*for\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*what\\s*did\\s*i\\s*have\\s*on\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*what\\s*did\\s*i\\s*eat\\s*on\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*view\\s*diary\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*check\\s*food\\s*$",
+      "^\\s*view\\s*food\\s*$",
+      "^\\s*what\\s*did\\s*i\\s*have\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*view\\s*food\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*food\\s*diary\\s*for\\s*(?P<group1>%SNIPSDATETIME%)\\s*$",
+      "^\\s*what\\s*did\\s*i\\s*eat\\s*(?P<group1>%SNIPSDATETIME%)\\s*$"
+    ]
+  },
+  "slot_names_to_entities": {
+    "LOG_MEAL": {
+      "meal_content": "meal_content",
+      "meal_date": "snips/datetime",
+      "meal_type": "meal_type"
+    },
+    "VIEW_MEAL_DIARY": {
+      "meal_date": "snips/datetime"
+    }
+  }
+}

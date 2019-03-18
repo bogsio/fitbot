@@ -1,6 +1,8 @@
 from datetime import datetime
 import io
+import os
 import json
+from pathlib import Path
 
 import requests
 from snips_nlu import SnipsNLUEngine
@@ -14,12 +16,17 @@ SLOT_TRANSFORMERS = {
     'snips/datetime': lambda value: datetime.strptime(value, '%Y-%m-%d %H:%M:%S %z')
 }
 
+# if not os.path.exists(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model"):
 with io.open(f"fitbot/datasets/{settings.TRAIN_FILE}") as f:
     data = f.read().replace('\ufeff', '')
     dataset = json.loads(data)
     nlu = SnipsNLUEngine(config=CONFIG_EN)
     nlu.fit(dataset)
     nlu.parse("I ate some bread with butter for breakfast")
+        # nlu.persist(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model")
+        # nlu.persist_metadata(Path(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model"))
+# else:
+#     nlu = SnipsNLUEngine.load_from_path(Path(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model"))
 
 
 def get_messenger_profile():
