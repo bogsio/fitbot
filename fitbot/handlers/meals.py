@@ -19,6 +19,7 @@ def display_meals(bot, person, meals):
 
 def complete_meal(bot, person, event):
     person.save_meal()
+    bot.send_typing(person)
     bot.send_text(person, "Done! Keep up the good work!")
 
     # meals for today
@@ -26,6 +27,7 @@ def complete_meal(bot, person, event):
     if not today_meals:
         return
 
+    bot.send_typing(person)
     bot.send_text(person, "Here's how you're doing today so far")
     display_meals(bot, person, today_meals)
 
@@ -38,6 +40,8 @@ def handle_log_meal_via_postback(bot, person, event):
     person.state = state
     person.context = ctx
     person.save()
+
+    bot.send_typing(person)
     bot.send_text(person, "Great, let's do that, just snap a picture of your food",
                   quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
 
@@ -71,6 +75,8 @@ def handle_log_meal_via_intent(bot, person, event):
     person.state = state
 
     person.save()
+
+    bot.send_typing(person)
     bot.send_text(person, "Snap a picture of your food",
                   quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
 
@@ -79,6 +85,7 @@ def handle_skip_meal_photo(bot, person, event):
     from fitbot.chatbot import States, PostBacks
     # person.context['image'] = 'https://proxy.duckduckgo.com/iu/?u=https%3A%2F%2Fupload.wikimedia.org%2Fwikipedia%2Fcommons%2Fthumb%2Ff%2Ff4%2FNorwegian.open.sandwich-01.jpg%2F1200px-Norwegian.open.sandwich-01.jpg&f=1'
     # person.save()
+    bot.send_typing(person)
     bot.send_text(person, "Ok, tell me a bit about your meal",
                   quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
 
@@ -94,6 +101,7 @@ def handle_meal_photo(bot, person, event):
     from fitbot.chatbot import States, PostBacks
     assert person.state == States.WAITING_FOR_MEAL_PHOTO
     if not event.has_images():
+        bot.send_typing(person)
         bot.send_text(person, "Sorry, I didn't get that ... Please upload a picture or press \"Skip Photo\"",
                       quick_replies=[('Skip Photo', PostBacks.SKIP_PHOTO)])
         return
@@ -104,6 +112,7 @@ def handle_meal_photo(bot, person, event):
     person.context['image'] = image_url
     person.save()
 
+    bot.send_typing(person)
     bot.send_text(person, "Ok, tell me a bit about your meal",
                   quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
 
@@ -111,6 +120,7 @@ def handle_meal_photo(bot, person, event):
 def handle_meal_comments(bot, person, event):
     from fitbot.chatbot import PostBacks
     if not event.has_text():
+        bot.send_typing(person)
         bot.send_text(person, "Sorry, I didn't get that ... ",
                       quick_replies=[('Skip Comments', PostBacks.SKIP_COMMENTS)])
         return
@@ -127,6 +137,7 @@ def display_meal_diary(bot, person, event):
     if person.context.get('day') is None:
         latest_date = Meal.objects.all().aggregate(Max('date'))['date__max']
         if latest_date is None:
+            bot.send_typing(person)
             bot.send_text(person, "You haven't logged anything yet, why don't you start now?",
                           quick_replies=[('Log Meal Now', PostBacks.LOG_SNACK)])
             return
@@ -141,13 +152,16 @@ def display_meal_diary(bot, person, event):
 
     # No meals logged on that day
     if not meals:
+        bot.send_typing(person)
         bot.send_text(person, f"You haven't logged anything on {d}",
                       quick_replies=[('Prev Day', PostBacks.PREV_DAY), ('Next Day', PostBacks.NEXT_DAY)])
         return
 
     # Finally, display the meals for that day
+    bot.send_typing(person)
     bot.send_text(person, f"Here's what you had on {d}")
     display_meals(bot, person, meals)
+    bot.send_typing(person)
     bot.send_text(person, "Checkout other days",
                   quick_replies=[('Prev Day', PostBacks.PREV_DAY), ('Next Day', PostBacks.NEXT_DAY)])
 

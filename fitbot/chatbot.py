@@ -1,4 +1,5 @@
 import json
+import time
 from pprint import pprint
 
 import requests
@@ -66,9 +67,39 @@ class Chatbot(object):
 
     _handlers = []
 
+    class SenderActions:
+        MARK_SEEN = 'mark_seen'
+        TYPING_ON = 'typing_on'
+        TYPING_OFF = 'typing_off'
+
     @property
     def handlers(self):
         return self._handlers
+
+
+    @staticmethod
+    def get_server_uri():
+        return "https://graph.facebook.com/v2.6/me/messages?access_token=%s" % settings.FB_ACCESS_TOKEN
+
+
+    @classmethod
+    def send_action(cls, person, action):
+        data = {
+            'recipient': {'id': person.fb_id},
+            'sender_action': action
+        }
+
+        response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
+
+    @classmethod
+    def send_mark_seen(cls, person):
+        cls.send_action(person, Chatbot.SenderActions.MARK_SEEN)
+
+    @classmethod
+    def send_typing(cls, person, seconds=1.2):
+        cls.send_action(person, Chatbot.SenderActions.TYPING_ON)
+        time.sleep(seconds)
+        cls.send_action(person, Chatbot.SenderActions.TYPING_OFF)
 
     @classmethod
     def send_text(cls, person, text, quick_replies=None):
@@ -78,7 +109,6 @@ class Chatbot(object):
         :param quick_replies: [(display1, postback1), ...]
         :return:
         """
-        uri = "https://graph.facebook.com/v2.6/me/messages?access_token=%s" % settings.FB_ACCESS_TOKEN
         data = {
             # 'messaging_type': 'RESPONSE',
             'recipient': {'id': person.fb_id},
@@ -100,7 +130,7 @@ class Chatbot(object):
         print("======================")
         pprint(data)
         print("======================")
-        response = requests.post(uri, data=json.dumps(data), headers={'content-type': 'application/json'})
+        response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
 
     @classmethod
     def send_carousel(cls, person, elements, height_ratio="tall"):
@@ -159,10 +189,7 @@ class Chatbot(object):
         print("======================")
         pprint(data)
         print("======================")
-        uri = "https://graph.facebook.com/v2.6/me/messages?access_token=%s" % settings.FB_ACCESS_TOKEN
-        response = requests.post(uri, data=json.dumps(data), headers={'content-type': 'application/json'})
-
-
+        response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
 
     @classmethod
     def register_handler(cls, **conditions):
