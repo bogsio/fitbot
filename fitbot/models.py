@@ -3,6 +3,28 @@ from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
 
 
+class Cuisine:
+    STANDARD = 'STANDARD'
+    KETO = 'KETO'
+    PALEO = 'PALEO'
+    VEGETARIAN = 'VEGETARIAN'
+    PRIMAL = 'PRIMAL'
+    VEGAN = 'VEGAN'
+    RAW_VEGAN = 'RAW_VEGAN'
+    LOW_CARB = 'LOW_CARB'
+
+    ALL = [
+        (STANDARD, 'Standard'),
+        (KETO, 'Keto'),
+        (PALEO, 'Paleo'),
+        (VEGETARIAN, 'Vegetarian'),
+        (PRIMAL, 'Primal'),
+        (VEGAN, 'Vegan'),
+        (RAW_VEGAN, 'Raw Vegan'),
+        (LOW_CARB, 'Low Carb')
+    ]
+
+
 class Person(models.Model):
     fb_id = models.CharField(max_length=200)
     last_seen = models.DateTimeField(blank=True, null=True)
@@ -86,7 +108,7 @@ class Progress(models.Model):
 class MealImage(models.Model):
     image = models.URLField(null=True, blank=True, max_length=1000)
     name = models.CharField(max_length=200)
-    tags = ArrayField(models.CharField(max_length=200), blank=True)
+    keywords = ArrayField(models.CharField(max_length=200), blank=True)
 
     @staticmethod
     def find_best(description):
@@ -97,10 +119,23 @@ class MealImage(models.Model):
         best_score = 0
 
         for meal_image in MealImage.objects.all():
-            image_tags = set(meal_image.tags)
-            intersected_tags = image_tags.intersection(description)
-            if len(intersected_tags) > best_score:
-                best_score = len(intersected_tags)
+            image_keywords = set(meal_image.keywords)
+            intersected_keywords = image_keywords.intersection(description)
+            if len(intersected_keywords) > best_score:
+                best_score = len(intersected_keywords)
                 best_image = meal_image
 
         return best_image
+
+
+class Recipe(models.Model):
+    title = models.CharField(max_length=300)
+    image = models.URLField(null=True, blank=True, max_length=1000)
+    website_name = models.CharField(max_length=200)
+    url = models.URLField(max_length=1000)
+    cuisine = models.CharField(max_length=100, choices=Cuisine.ALL, default=Cuisine.STANDARD)
+    keywords = ArrayField(models.CharField(max_length=200), blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Recipe[\"{self.title}\"]"
