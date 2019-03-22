@@ -1,3 +1,4 @@
+import random
 from datetime import datetime
 import io
 import os
@@ -199,6 +200,28 @@ class MessengerEvent(object):
 
     def get_sender(self):
         return self._event['messaging'][0]['sender']['id']
+
+
+def pick_probabilistically(items, max_count=5):
+    """
+    items = [(item, weight), ...]
+    """
+
+    total_weights = sum([w for _, w in items])
+    random_01 = random.random()
+
+    selected = []
+    while len(selected) < max_count and items:
+        accumulator = 0.0
+        for idx, (item, weight) in enumerate(items):
+            accumulator += weight / total_weights
+            if accumulator > random_01:
+                selected.append(item)
+                del items[idx]
+                break
+
+    return selected
+
 
 
 

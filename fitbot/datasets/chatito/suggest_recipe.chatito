@@ -1,0 +1,63 @@
+%[SUGGEST_RECIPE]('training': '1200')
+    I want to cook something @[cuisine]
+    I want to cook something with @[ingredient]
+    suggest something @[cuisine] with @[ingredient] to cook
+    what to cook today
+    tell me a cooking idea
+    I don't know what to cook
+    Let's cook something @[cuisine]
+    Let's cook something with @[ingredient]
+    cook @[cuisine] with @[ingredient]
+    I want to cook something
+    I want to prepare something @[cuisine]
+    what to prepare today
+    what to eat today
+    what do you suggest to cook
+    what can I cook with @[ingredient]
+    I'm in the mood for some @[ingredient]
+    I feel like eating some @[ingredient]
+    I would like to cook something @[cuisine]
+    I would like to cook something @[cuisine] with @[ingredient]
+    I want to cook something with @[ingredient] and @[ingredient]
+    feel like cooking something @[cuisine]
+    give me a recipe for @[ingredient]
+    tell me a good recipe for @[cuisine] @[ingredient]
+    I want to cook a @[ingredient] recipe
+    can you please suggest me a @[cuisine] @[ingredient] recipe
+
+@[cuisine]
+    ~[vegan]
+    ~[vegetarian]
+    ~[paleo]
+    ~[raw vegan]
+    ~[low carb]
+    ~[keto]
+    ~[primal]
+
+@[ingredient]
+    ~[cheese]
+    ~[meat]
+    ~[spinach]
+    ~[rice]
+    ~[avocado]
+    ~[rice]
+    ~[lettuce]
+    ~[bananas]
+    ~[lamb]
+    ~[veal]
+    ~[chicken]
+    ~[fish]
+    ~[nuts]
+    ~[pork]
+    ~[potatoes]
+    ~[sweet potatoes]
+    ~[tomatoes]
+    ~[cucumbers]
+    ~[kale]
+    ~[fresh fruit]
+    ~[fruit]
+    ~[cabage]
+    ~[prawns]
+    ~[oysters]
+    ~[beans]
+    ~[peas]

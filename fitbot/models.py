@@ -1,6 +1,10 @@
+from random import choice
+
 from django.utils.dateparse import parse_date
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
+
+from fitbot.utils import pick_probabilistically
 
 
 class Cuisine:
@@ -136,6 +140,26 @@ class Recipe(models.Model):
     cuisine = models.CharField(max_length=100, choices=Cuisine.ALL, default=Cuisine.STANDARD)
     keywords = ArrayField(models.CharField(max_length=200), blank=True)
     description = models.TextField(null=True, blank=True)
+
+    @staticmethod
+    def find_best(cuisine=None, keywords=None, count=5):
+        if keywords is None:
+            keywords = []
+
+        recipes = Recipe.objects.all()
+        if cuisine is not None:
+            recipes = recipes.filter(cuisine=cuisine)
+
+        suitable_recipes = []
+
+        for recipe in recipes:
+            recipe_keywords = set(recipe.keywords)
+            intersected_keywords = recipe_keywords.intersection(keywords)
+            if len(intersected_keywords) > 0:
+                suitable_recipes.append((recipe, len(intersected_keywords)))
+
+        selected_recipes = pick_probabilistically(suitable_recipes, max_count=5)
+        return selected_recipes
 
     def __str__(self):
         return f"Recipe[\"{self.title}\"]"

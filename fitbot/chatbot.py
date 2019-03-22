@@ -6,7 +6,7 @@ import requests
 
 from django.conf import settings
 
-from fitbot.handlers import progress, meals
+from fitbot.handlers import progress, meals, recipes
 from fitbot.models import Person
 from fitbot.utils import MessengerEvent
 
@@ -46,6 +46,7 @@ class PostBacks:
 class Intents:
     LOG_MEAL = "LOG_MEAL"
     VIEW_MEAL_DIARY = "VIEW_MEAL_DIARY"
+    SUGGEST_RECIPE = "SUGGEST_RECIPE"
 
 
 class Meals:
@@ -271,6 +272,7 @@ class Chatbot(object):
         return best_handler(self, person, event)
 
 
+# Meal Related handlers
 Chatbot.register_handler(postback__in=PB_TO_MEAL_TYPES.keys())(
     meals.handle_log_meal_via_postback)
 Chatbot.register_handler(intent__eq=Intents.LOG_MEAL)(
@@ -293,6 +295,7 @@ Chatbot.register_handler(intent__eq=Intents.VIEW_MEAL_DIARY)(
     meals.handle_check_food_via_intent)
 
 
+# Log Progress handlers
 Chatbot.register_handler(postback__eq=PostBacks.LOG_PROGRESS)(
     progress.handle_log_progress)
 Chatbot.register_handler(state__eq=States.WAITING_FOR_PROGRESS_PHOTO)(
@@ -307,3 +310,8 @@ Chatbot.register_handler(state__eq=States.WAITING_FOR_PROGRESS_BMI)(
     progress.handle_progress_bmi)
 Chatbot.register_handler(postback__eq=PostBacks.SKIP_BMI, state__eq=States.WAITING_FOR_PROGRESS_BMI)(
     progress.handle_skip_progress_bmi)
+
+
+# Suggest Recipes
+Chatbot.register_handler(intent__eq=Intents.SUGGEST_RECIPE)(
+    recipes.handle_recipe_request_via_intent)
