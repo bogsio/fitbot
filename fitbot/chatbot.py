@@ -48,6 +48,8 @@ class Intents:
     LOG_MEAL = "LOG_MEAL"
     VIEW_MEAL_DIARY = "VIEW_MEAL_DIARY"
     SUGGEST_RECIPE = "SUGGEST_RECIPE"
+    GREETING = "GREETING"
+    GOOD_BYE = "GOOD_BYE"
 
 
 class Meals:
@@ -322,5 +324,8 @@ Chatbot.register_handler(postback__eq=PostBacks.SKIP_BMI, state__eq=States.WAITI
 Chatbot.register_handler(intent__eq=Intents.SUGGEST_RECIPE)(
     recipes.handle_recipe_request_via_intent)
 
+
 # Default Answer
+Chatbot.register_handler(intent__eq=Intents.GREETING)(default.handle_say_hello)
+Chatbot.register_handler(intent__eq=Intents.GOOD_BYE)(default.handle_say_bye)
 Chatbot.register_handler()(default.handle_default)
