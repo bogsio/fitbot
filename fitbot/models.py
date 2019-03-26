@@ -1,5 +1,3 @@
-from random import choice
-
 from django.utils.dateparse import parse_date
 from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models

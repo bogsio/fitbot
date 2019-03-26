@@ -1,12 +1,13 @@
 import json
 import time
 from pprint import pprint
+from random import choice
 
 import requests
 
 from django.conf import settings
 
-from fitbot.handlers import progress, meals, recipes
+from fitbot.handlers import progress, meals, recipes, default
 from fitbot.models import Person
 from fitbot.utils import MessengerEvent
 
@@ -110,6 +111,11 @@ class Chatbot(object):
         :param quick_replies: [(display1, postback1), ...]
         :return:
         """
+
+        # If we have more than one choice, choose a random one
+        if isinstance(text, (list, tuple)):
+            text = choice(text)
+
         data = {
             # 'messaging_type': 'RESPONSE',
             'recipient': {'id': person.fb_id},
@@ -315,3 +321,6 @@ Chatbot.register_handler(postback__eq=PostBacks.SKIP_BMI, state__eq=States.WAITI
 # Suggest Recipes
 Chatbot.register_handler(intent__eq=Intents.SUGGEST_RECIPE)(
     recipes.handle_recipe_request_via_intent)
+
+# Default Answer
+Chatbot.register_handler()(default.handle_default)
