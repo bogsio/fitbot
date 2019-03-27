@@ -23,7 +23,6 @@ with io.open(f"fitbot/datasets/{settings.TRAIN_FILE}") as f:
     dataset = json.loads(data)
     nlu = SnipsNLUEngine(config=CONFIG_EN)
     nlu.fit(dataset)
-    nlu.parse("I ate some bread with butter for breakfast")
         # nlu.persist(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model")
         # nlu.persist_metadata(Path(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model"))
 # else:
