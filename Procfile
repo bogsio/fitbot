@@ -1,2 +1,2 @@
-release: ./release-tasks.sh
+release: ./release.sh
 web: gunicorn fitbot.wsgi --log-file -
