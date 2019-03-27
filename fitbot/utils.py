@@ -23,7 +23,7 @@ with io.open(f"fitbot/datasets/{settings.TRAIN_FILE}") as f:
     data = f.read().replace('\ufeff', '')
     dataset = json.loads(data)
     nlu = SnipsNLUEngine(config=CONFIG_EN)
-    subprocess.run("python -m snips_nlu download en")
+    subprocess.run(["python", "-m", "snips_nlu", "download", "en"])
     nlu.fit(dataset)
         # nlu.persist(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model")
         # nlu.persist_metadata(Path(f"fitbot/nlu_models/{settings.TRAIN_FILE}.model"))
