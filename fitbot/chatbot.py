@@ -134,11 +134,11 @@ class Chatbot(object):
                 } for qr in quick_replies
             ]
         # print("Posting to", uri)
-        print("\n\n")
-        print("Outgoing data")
-        print("======================")
-        pprint(data)
-        print("======================")
+        # print("\n\n")
+        # print("Outgoing data")
+        # print("======================")
+        # pprint(data)
+        # print("======================")
         response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
 
     @classmethod
@@ -159,7 +159,7 @@ class Chatbot(object):
         }
 
         for element in elements:
-            print("- Element", element)
+            # print("- Element", element)
             title, image_url, subtitle, action, buttons = element
             element_payload = {
                 "title": title,
@@ -193,11 +193,11 @@ class Chatbot(object):
 
             data["message"]["attachment"]["payload"]["elements"].append(element_payload)
 
-        print("\n\n")
-        print("Outgoing data")
-        print("======================")
-        pprint(data)
-        print("======================")
+        # print("\n\n")
+        # print("Outgoing data")
+        # print("======================")
+        # pprint(data)
+        # print("======================")
         response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
 
     @classmethod

@@ -1,6 +1,3 @@
-from fitbot.chatbot import PostBacks
-
-
 def handle_default(bot, person, event):
     bot.send_typing(person)
     bot.send_text(person, [
@@ -11,6 +8,7 @@ def handle_default(bot, person, event):
 
 
 def handle_say_hello(bot, person, event):
+    from fitbot.chatbot import PostBacks
     bot.send_typing(person)
     bot.send_text(person, [
         "Hi there!",
@@ -25,7 +23,9 @@ def handle_say_hello(bot, person, event):
         "How can I help you?",
     ], quick_replies=[
         ("Check Food Diary", PostBacks.CHECK_FOOD),
-
+        ("Log Breakfast", PostBacks.LOG_BREAKFAST),
+        ("Log Lunch", PostBacks.LOG_LUNCH),
+        ("Log Dinner", PostBacks.LOG_DINNER),
     ])
 
 
