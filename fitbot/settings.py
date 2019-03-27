@@ -29,7 +29,7 @@ SECRET_KEY = '@sqpv9l-z@3zyn)c0+os3bn1zjt34ka$svlcae=ev8h66w6o$#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.ngrok.io', 'localhost']
+ALLOWED_HOSTS = ['.ngrok.io', 'localhost', 'vast-forest-17217.herokuapp.com']
 
 
 # Application definition
