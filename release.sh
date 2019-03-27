@@ -1,0 +1,1 @@
+python -m snips_nlu download en
