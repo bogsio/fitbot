@@ -49,6 +49,8 @@ class Person(models.Model):
                 image_url = image.image
             else:
                 image_url = "https://dl.dropboxusercontent.com/s/r2tgdyfag9egtql/Depositphotos_11389585_m-2015.jpg?dl=0"
+        else:
+            image_url = self.context['image']
 
         meal = Meal.objects.create(
             person=self,
