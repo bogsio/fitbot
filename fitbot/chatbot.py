@@ -229,12 +229,15 @@ class Chatbot(object):
             chunks.append('')
 
         if chunks[0] == 'postback':
+            print("Checking for postback")
             if not event.has_postback():
                 return False
 
             pb = event.get_postback()
+            print("pb=", pb)
 
             if chunks[1] == 'eq':
+                print("pb == value", pb, condition_value, pb == condition_value)
                 return pb == condition_value
 
             if chunks[1] == 'in':

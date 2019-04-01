@@ -89,8 +89,10 @@ class MessengerEvent(object):
         return self._nlu_result
 
     def has_postback(self):
+        print("Detecting postback")
         try:
             _ = self._event['messaging'][0]['postback']
+            print("it has postback")
             return True
         except:
             pass
@@ -100,6 +102,7 @@ class MessengerEvent(object):
             return True
         except:
             pass
+        print("it has <NO> postback")
 
         return False
 
@@ -137,6 +140,7 @@ class MessengerEvent(object):
         return False
 
     def get_postback(self):
+        print("Detecting postback")
         if not self.has_postback():
             return None
 
