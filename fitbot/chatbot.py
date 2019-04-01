@@ -43,6 +43,7 @@ class PostBacks:
     NEXT_DAY = "NEXT_DAY"
 
     GET_STARTED = "GET_STARTED"
+    CONTINUE_INTRO_PART2 = "CONTINUE_INTRO1"
 
 
 class Intents:
@@ -343,4 +344,5 @@ Chatbot.register_handler(intent__eq=Intents.GREETING)(default.handle_say_hello)
 Chatbot.register_handler(intent__eq=Intents.GOOD_BYE)(default.handle_say_bye)
 Chatbot.register_handler(intent__eq=Intents.PROFANITY)(profanity.handle_profanity)
 Chatbot.register_handler(postback__eq=PostBacks.GET_STARTED)(default.handle_get_started)
+Chatbot.register_handler(postback__eq=PostBacks.CONTINUE_INTRO_PART2)(default.handle_get_started_part2())
 Chatbot.register_handler()(default.handle_default)
