@@ -1,4 +1,4 @@
-from fitbot.chatbot import PostBacks
+
 
 
 def handle_default(bot, person, event):
@@ -43,6 +43,7 @@ def handle_say_bye(bot, person, event):
 
 
 def handle_get_started(bot, person, event):
+    from fitbot.chatbot import PostBacks
     bot.send_typing(person)
     bot.send_text(person, [
         "Hello stranger!",
@@ -62,6 +63,7 @@ def handle_get_started(bot, person, event):
 
 
 def handle_get_started_part2(bot, person, event):
+    from fitbot.chatbot import PostBacks
     bot.send_typing(person)
     bot.send_text(person, [
         "You can either invoke me by using the Messenger "
