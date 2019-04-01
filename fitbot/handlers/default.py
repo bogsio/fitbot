@@ -1,4 +1,4 @@
-
+from fitbot.models import WeirdPhrase
 
 
 def handle_default(bot, person, event):
@@ -8,6 +8,9 @@ def handle_default(bot, person, event):
         "Not sure I can help you with that",
         "That's an interesting idea, but I don't think I can help you with that"
     ])
+
+    if event.has_text():
+        WeirdPhrase.objects.create(text=event.get_text())
 
 
 def handle_say_hello(bot, person, event):

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import Person, Meal, Progress, MealImage, Recipe
+from .models import Person, Meal, Progress, MealImage, Recipe, WeirdPhrase
 
 
 @admin.register(Person)
@@ -39,3 +39,8 @@ class RecipeAdmin(admin.ModelAdmin):
 
     def admin_image(self, obj):
         return mark_safe('<img width="50px" src="%s"/>' % obj.image)
+
+
+@admin.register(WeirdPhrase)
+class WeirdPhraseAdmin(admin.ModelAdmin):
+    pass

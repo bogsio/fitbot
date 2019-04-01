@@ -163,3 +163,10 @@ class Recipe(models.Model):
 
     def __str__(self):
         return f"Recipe[\"{self.title}\"]"
+
+
+class WeirdPhrase(models.Model):
+    text = models.TextField()
+
+    def __str__(self):
+        return self.text
