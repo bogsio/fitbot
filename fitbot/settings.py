@@ -140,4 +140,4 @@ FB_ACCESS_TOKEN = os.environ.get('FB_ACCESS_TOKEN')
 FB_APP_ID = os.environ.get('FB_APP_ID')
 FB_CHALLENGE = os.environ.get('FB_CHALLENGE')
 
-TRAIN_FILE = os.environ.get('TRAIN_FILE')
+TRAIN_FILE = 'training_dataset_1554111396.json'

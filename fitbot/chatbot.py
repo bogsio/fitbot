@@ -1,13 +1,12 @@
 import json
 import time
-from pprint import pprint
 from random import choice
 
 import requests
 
 from django.conf import settings
 
-from fitbot.handlers import progress, meals, recipes, default
+from fitbot.handlers import progress, meals, recipes, default, profanity
 from fitbot.models import Person
 from fitbot.utils import MessengerEvent
 
@@ -50,6 +49,7 @@ class Intents:
     SUGGEST_RECIPE = "SUGGEST_RECIPE"
     GREETING = "GREETING"
     GOOD_BYE = "GOOD_BYE"
+    PROFANITY = "PROFANITY"
 
 
 class Meals:
@@ -328,4 +328,5 @@ Chatbot.register_handler(intent__eq=Intents.SUGGEST_RECIPE)(
 # Default Answer
 Chatbot.register_handler(intent__eq=Intents.GREETING)(default.handle_say_hello)
 Chatbot.register_handler(intent__eq=Intents.GOOD_BYE)(default.handle_say_bye)
+Chatbot.register_handler(intent__eq=Intents.PROFANITY)(profanity.handle_profanity)
 Chatbot.register_handler()(default.handle_default)
