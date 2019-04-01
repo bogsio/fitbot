@@ -42,6 +42,8 @@ class PostBacks:
     PREV_DAY = "PREV_DAY"
     NEXT_DAY = "NEXT_DAY"
 
+    GET_STARTED = "GET_STARTED"
+
 
 class Intents:
     LOG_MEAL = "LOG_MEAL"
@@ -80,11 +82,9 @@ class Chatbot(object):
     def handlers(self):
         return self._handlers
 
-
     @staticmethod
     def get_server_uri():
         return "https://graph.facebook.com/v2.6/me/messages?access_token=%s" % settings.FB_ACCESS_TOKEN
-
 
     @classmethod
     def send_action(cls, person, action):
@@ -93,7 +93,11 @@ class Chatbot(object):
             'sender_action': action
         }
 
-        response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
+        response = requests.post(
+            cls.get_server_uri(),
+            data=json.dumps(data),
+            headers={'content-type': 'application/json'}
+        )
 
     @classmethod
     def send_mark_seen(cls, person):
@@ -119,7 +123,7 @@ class Chatbot(object):
             text = choice(text)
 
         data = {
-            # 'messaging_type': 'RESPONSE',
+            'messaging_type': 'RESPONSE',
             'recipient': {'id': person.fb_id},
             'message': {'text': text}
         }
@@ -133,18 +137,21 @@ class Chatbot(object):
 
                 } for qr in quick_replies
             ]
-        # print("Posting to", uri)
-        # print("\n\n")
+
         # print("Outgoing data")
         # print("======================")
         # pprint(data)
         # print("======================")
-        response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
+        response = requests.post(
+            cls.get_server_uri(),
+            data=json.dumps(data),
+            headers={'content-type': 'application/json'}
+        )
 
     @classmethod
     def send_carousel(cls, person, elements, height_ratio="tall"):
         data = {
-            # 'messaging_type': 'RESPONSE',
+            'messaging_type': 'RESPONSE',
             "recipient": {"id": person.fb_id},
             "message": {
                 "attachment": {
@@ -159,7 +166,6 @@ class Chatbot(object):
         }
 
         for element in elements:
-            # print("- Element", element)
             title, image_url, subtitle, action, buttons = element
             element_payload = {
                 "title": title,
@@ -198,7 +204,11 @@ class Chatbot(object):
         # print("======================")
         # pprint(data)
         # print("======================")
-        response = requests.post(cls.get_server_uri(), data=json.dumps(data), headers={'content-type': 'application/json'})
+        response = requests.post(
+            cls.get_server_uri(),
+            data=json.dumps(data),
+            headers={'content-type': 'application/json'}
+        )
 
     @classmethod
     def register_handler(cls, **conditions):
@@ -329,4 +339,5 @@ Chatbot.register_handler(intent__eq=Intents.SUGGEST_RECIPE)(
 Chatbot.register_handler(intent__eq=Intents.GREETING)(default.handle_say_hello)
 Chatbot.register_handler(intent__eq=Intents.GOOD_BYE)(default.handle_say_bye)
 Chatbot.register_handler(intent__eq=Intents.PROFANITY)(profanity.handle_profanity)
+Chatbot.register_handler(postback__eq=PostBacks.GET_STARTED)(default.handle_get_started)
 Chatbot.register_handler()(default.handle_default)

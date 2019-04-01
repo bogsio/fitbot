@@ -71,14 +71,6 @@ class MessengerEvent(object):
 
     @staticmethod
     def fetch_nlu_data(text):
-        # text_input = dialogflow.types.TextInput(text=text, language_code='en')
-        # query_input = dialogflow.types.QueryInput(text=text_input)
-        # response = session_client.detect_intent(
-        #     session=session, query_input=query_input)
-        #
-        # print(response)
-        # print(response.intent)
-        # print(response.entities)
         if nlu is not None:
             p = nlu.parse(text)
             print(p)
@@ -95,7 +87,6 @@ class MessengerEvent(object):
 
             self._nlu_result = nlu.parse(text)
         return self._nlu_result
-
 
     def has_postback(self):
         try:
